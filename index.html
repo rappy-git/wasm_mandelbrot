@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>wasm mandelbrot</title>
+</head>
+<body>
+    <canvas id="canvas" width="720" height="720" style="border: 1px solid;"></canvas>
+    <script src="mandelbrot.js"></script>
+    <script>
+        Module.onRuntimeInitialized = function(){
+            const context = document.getElementById("canvas").getContext("2d");
+            const ImageHeight = 720;
+            const ImageWidth = 720;
+
+            const p = _create_buffer(ImageHeight, ImageWidth);
+            _draw_mandelbrot(p, ImageHeight, ImageWidth);
+            const imageData = Module.HEAPU8.subarray(p, p+(ImageHeight*ImageWidth*4));
+            _destroy_buffer(p);
+
+            const image = context.createImageData(ImageHeight, ImageWidth);
+            image.data.set(imageData);
+            context.putImageData(image, 0, 0);
+        }
+    </script>
+</body>
+</html>
